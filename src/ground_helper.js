@@ -1,7 +1,6 @@
 function InitGround(){
     gl.useProgram( groundProgram );
     modelGround = new Object();
-    // CreateMVPTeapotGround();
     InitGroundTexture(gl);
     createRectangle();
 }
@@ -57,20 +56,4 @@ function createRectangle(){
     gl.enableVertexAttribArray(groundProgram.vPosition);
 
     num_indices_ground = 6;
-}
-
-function CreateMVPTeapotGround(){
-    var PLoc = gl.getUniformLocation(groundProgram, "P");
-    var P = perspective(65, 1, 1, 10);
-    gl.uniformMatrix4fv(PLoc, false, flatten(P));
-
-    var VLoc = gl.getUniformLocation(groundProgram, "V");
-    var eyeLoc = gl.getUniformLocation(groundProgram, "eye");
-    var at = vec3(0, 0, -3.0);
-    var eye = vec3(0, 0, 1.0);
-    var up = vec3(0.0, 1.0, 0.0);
-    var V = lookAt(eye, at, up);
-    // var V = mat4();
-    gl.uniformMatrix4fv(VLoc, false, flatten(V));
-    gl.uniform3fv(eyeLoc, eye);
 }

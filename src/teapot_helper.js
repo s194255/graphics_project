@@ -67,21 +67,6 @@ function readOBJFile(fileName, gl, model, scale, reverse) {
     request.open('GET', fileName, true); // Create a request to get file
     request.send(); // Send the request
 }
-function CreateMVPTeapot(){
-    var PLoc = gl.getUniformLocation(teapotProgram, "P");
-    var P = perspective(65, 1, 1, 10);
-    gl.uniformMatrix4fv(PLoc, false, flatten(P));
-
-    var VLoc = gl.getUniformLocation(teapotProgram, "V");
-    var eyeLoc = gl.getUniformLocation(teapotProgram, "eye");
-    var at = vec3(0, 0, -3.0);
-    var eye = vec3(0, 0, 1.0);
-    var up = vec3(0.0, 1.0, 0.0);
-    var V = lookAt(eye, at, up);
-    // var V = mat4();
-    gl.uniformMatrix4fv(VLoc, false, flatten(V));
-    gl.uniform3fv(eyeLoc, eye);
-}
 
 function createSlidersTeapot(){
     var kdRange = document.getElementById("kdRange");
@@ -148,7 +133,6 @@ function createSlidersTeapot(){
 }
 function initTeapot(){
     gl.useProgram( teapotProgram );
-    // CreateMVPTeapot();
     var LaLoc = gl.getUniformLocation(teapotProgram, "La");
     var La = vec3(1.0, 1.0, 1.0);
     gl.uniform3fv(LaLoc, La);

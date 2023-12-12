@@ -29,9 +29,27 @@ window.onload = function init()
     }
     teapotProgram = initShaders(gl, "vertex-shader-teapot", "fragment-shader-teapot" );
     groundProgram = initShaders(gl, "vertex-shader-ground", "fragment-shader-ground" );
+    InitPV();
     initTeapot();
     InitGround();
     animate();
+}
+
+function InitPV(){
+    P = perspective(65, 1, 1, 10);
+    var at = vec3(0, 0, -3.0);
+    var eye = vec3(0, 0, 1.0);
+    var up = vec3(0.0, 1.0, 0.0);
+    V = lookAt(eye, at, up);
+    gl.useProgram(groundProgram)
+    gl.uniformMatrix4fv(gl.getUniformLocation(groundProgram, "P"), false, flatten(P));
+    gl.uniformMatrix4fv(gl.getUniformLocation(groundProgram, "V"), false, flatten(V));
+    gl.uniform3fv(gl.getUniformLocation(groundProgram, "eye"), eye);
+
+    gl.useProgram(teapotProgram)
+    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "P"), false, flatten(P));
+    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "V"), false, flatten(V));
+    gl.uniform3fv(gl.getUniformLocation(teapotProgram, "eye"), eye);
 }
 
 function render(){
