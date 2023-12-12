@@ -69,8 +69,8 @@ function CreateMVPTeapotGround(){
     var at = vec3(0, 0, -3.0);
     var eye = vec3(0, 0, 1.0);
     var up = vec3(0.0, 1.0, 0.0);
-    // var V = lookAt(eye, at, up);
-    var V = mat4();
+    var V = lookAt(eye, at, up);
+    // var V = mat4();
     gl.uniformMatrix4fv(VLoc, false, flatten(V));
     gl.uniform3fv(eyeLoc, eye);
 }
