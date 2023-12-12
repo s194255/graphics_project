@@ -1,7 +1,7 @@
 function InitGround(){
     gl.useProgram( groundProgram );
     modelGround = new Object();
-    CreateMVPTeapotGround();
+    // CreateMVPTeapotGround();
     InitGroundTexture(gl);
     createRectangle();
 }

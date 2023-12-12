@@ -81,16 +81,6 @@ function CreateMVPTeapot(){
     // var V = mat4();
     gl.uniformMatrix4fv(VLoc, false, flatten(V));
     gl.uniform3fv(eyeLoc, eye);
-
-    var LaLoc = gl.getUniformLocation(teapotProgram, "La");
-    var La = vec3(1.0, 1.0,1.0);
-    gl.uniform3fv(LaLoc, La);
-
-    // var MLoc = gl.getUniformLocation(teapotProgram, "M");
-    // modelTeapot.M = translate(0, -1, -3);
-    // gl.uniformMatrix4fv(MLoc, false, flatten(modelTeapot.M));
-
-    Mo = mat4();
 }
 
 function createSlidersTeapot(){
@@ -158,7 +148,11 @@ function createSlidersTeapot(){
 }
 function initTeapot(){
     gl.useProgram( teapotProgram );
-    CreateMVPTeapot();
+    // CreateMVPTeapot();
+    var LaLoc = gl.getUniformLocation(teapotProgram, "La");
+    var La = vec3(1.0, 1.0, 1.0);
+    gl.uniform3fv(LaLoc, La);
+    Mo = mat4();
     createSlidersTeapot();
     modelTeapot = initObject(gl, teapotProgram, "teapot.obj", 0.25);
 }
