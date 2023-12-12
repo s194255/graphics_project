@@ -132,15 +132,6 @@ function renderReflectionTeapot(){
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
 
-    var eye_up = vec4(0.0, 1.0, 0.0 ,1.0);
-    var eye_plane = vec4(0.0, -1.0, -3.0, 1.0);
-    // var eye_up = mult(V,vec4(0.0, 1.0, 0.0 ,1.0));
-    // var eye_plane = mult(V,vec4(0.0, -1.0, -3.0, 1.0));
-    var Plane = vec4(eye_up[0], eye_up[1], eye_up[2], eye_up[0]*eye_plane[0]+eye_up[1]*eye_plane[1]+eye_up[2]*eye_plane[2]);
-    var P_refl = modifyProjectionMatrix(mult(V,Plane), P);
-    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "P"), false, flatten(P_refl));
-
-
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
     modelTeapot.M = translate(0, -1, -3);
     var teapotHeight = 0.5;
@@ -154,6 +145,13 @@ function renderReflectionTeapot(){
     
     modelTeapot.M = mult(R, modelTeapot.M);
     gl.uniformMatrix4fv(MLoc, false, flatten(modelTeapot.M));
+    
+    var eye_up = vec4(0.0, -1.0, 0.0 ,1.0);
+    var eye_plane = vec4(0.0, -1.0, -3.0, 1.0);
+    var Plane = vec4(eye_up[0], eye_up[1], eye_up[2], -eye_up[0]*eye_plane[0]-eye_up[1]*eye_plane[1]-eye_up[2]*eye_plane[2]);
+    var P_refl = modifyProjectionMatrix(Plane, P);
+    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "P"), false, flatten(P_refl));
+
     gl.uniform4fv(gl.getUniformLocation(teapotProgram, "colorScaler"), vec4(1.0, 1.0, 1.0, 1.0));
     
     if (!g_drawingInfo && g_objDoc && g_objDoc.isMTLComplete()) {
