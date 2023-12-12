@@ -69,13 +69,13 @@ function readOBJFile(fileName, gl, model, scale, reverse) {
 }
 function CreateMVPTeapot(){
     var PLoc = gl.getUniformLocation(teapotProgram, "P");
-    var P = perspective(45, 1, 1, 10);
+    var P = perspective(65, 1, 1, 10);
     gl.uniformMatrix4fv(PLoc, false, flatten(P));
 
     var VLoc = gl.getUniformLocation(teapotProgram, "V");
     var eyeLoc = gl.getUniformLocation(teapotProgram, "eye");
-    var at = vec3(0, 0, -3);
-    var eye = vec3(0, 0, 1);
+    var at = vec3(0, 0, -3.0);
+    var eye = vec3(0, 0, 1.0);
     var up = vec3(0.0, 1.0, 0.0);
     var V = lookAt(eye, at, up);
     // var V = mat4();

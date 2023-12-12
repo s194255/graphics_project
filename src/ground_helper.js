@@ -61,13 +61,13 @@ function createRectangle(){
 
 function CreateMVPTeapotGround(){
     var PLoc = gl.getUniformLocation(groundProgram, "P");
-    var P = perspective(45, 1, 1, 10);
+    var P = perspective(65, 1, 1, 10);
     gl.uniformMatrix4fv(PLoc, false, flatten(P));
 
     var VLoc = gl.getUniformLocation(groundProgram, "V");
     var eyeLoc = gl.getUniformLocation(groundProgram, "eye");
-    var at = vec3(0, -1, -10);
-    var eye = add(at, vec3(10, 10, 10));
+    var at = vec3(0, 0, -3.0);
+    var eye = vec3(0, 0, 1.0);
     var up = vec3(0.0, 1.0, 0.0);
     // var V = lookAt(eye, at, up);
     var V = mat4();
