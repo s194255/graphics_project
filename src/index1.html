@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>Task 9.1</title>
+    <script type="text/javascript" src="../angelCommon/webgl-utils.js"></script>
+    <script type="text/javascript" src="../angelCommon/initShaders.js"></script>
+    <script type="text/javascript" src="../angelCommon/MV.js"></script>
+    <script type="text/javascript" src="OBJParser.js"></script>
+    <script type="text/javascript" src="teapot_helper.js"></script>
+    <script type="text/javascript" src="ground_helper.js"></script>
+</head>
+<html><body>
+<canvas id="c" width="512" height="512"/>
+<script type="text/javascript" src="ws1.js"></script>
+<script id="vertex-shader-teapot" type="x-shader/x-vertex">
+    attribute vec4 a_Position;
+    attribute vec4 a_Normal;
+    attribute vec4 a_Color;
+    
+    uniform mat4 M;
+    uniform mat4 V;
+    uniform mat4 P;
+    uniform vec3 eye;
+    
+    uniform vec4 lightPos;
+
+    varying vec4 v_Color;
+    varying vec3 n_frag;
+    varying vec3 w_i_frag;
+    varying vec3 w_r_frag;
+    varying vec3 w_0_frag;
+    void main() {
+        gl_Position = P * V * M * a_Position;
+        vec4 pos = M * a_Position;
+        vec3 n = - normalize(a_Normal).xyz;
+        // vec3 n = normalize(pos).xyz;
+        vec3 w_i = lightPos.w == 0.0 ? normalize(-lightPos.xyz) : normalize(lightPos.xyz - pos.xyz);
+        // vec3 w_0 = normalize(normalize(pos).xyz - eye);
+        vec3 w_0 = normalize(eye - normalize(pos).xyz);
+        vec3 w_r = normalize(2.0 * dot(w_i, n) * n - w_i);
+        v_Color = a_Color;
+        n_frag = n;
+        w_i_frag = w_i;
+        w_r_frag = w_r;
+        w_0_frag = w_0;
+    }
+</script>
+<script id="fragment-shader-teapot" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec4 v_Color;
+    varying vec3 n_frag;
+    varying vec3 w_i_frag;
+    varying vec3 w_r_frag;
+    varying vec3 w_0_frag;
+
+    uniform float k_d;
+    uniform float k_a;
+    uniform float k_s;
+    uniform float s;
+    uniform vec3 La;
+    uniform vec3 Li;
+    uniform vec4 colorScaler;
+
+    void main() {
+        // gl_FragColor = v_Color;
+        vec3 Lrd = k_d * Li * max(dot(normalize(n_frag), normalize(w_i_frag)), 0.0);
+        vec3 Lra = k_a * La;
+        vec3 Lrs = k_s * Li * pow(max(dot(normalize(w_r_frag), normalize(w_0_frag)), 0.0), s); 
+        gl_FragColor = vec4(Lrd + Lra + Lrs, 1.0)*colorScaler;
+    }
+</script>
+<script id="vertex-shader-ground" type="x-shader/x-vertex">
+    attribute vec4 a_Position;
+    attribute vec2 vTexCoord;
+    varying vec2 fTexCoord;
+    varying vec4 v_Color;
+    uniform mat4 M;
+    uniform mat4 V;
+    uniform mat4 P;
+    void main() {
+        gl_Position = P * V * M * a_Position;
+        fTexCoord = vTexCoord;
+    }
+</script>
+<script id="fragment-shader-ground" type="x-shader/x-fragment">
+    precision mediump float;
+    varying vec2 fTexCoord;
+    uniform sampler2D texture;
+    uniform sampler2D quadTexture;
+    uniform vec4 colorScaler;
+    void main() {
+        gl_FragColor = texture2D(texture, fTexCoord)*colorScaler;
+    }
+</script>
+</canvas>
+<div>
+    <label for="kdRange">k_d:</label>
+    <input type="range" id="kdRange" min="0" max="2" step="0.01" value="1">
+</div>
+<div>
+    <label for="kaRange">k_a:</label>
+    <input type="range" id="kaRange" min="0" max="0.5" step="0.01" value="0.0">
+</div>
+<div>
+    <label for="ksRange">k_s:</label>
+    <input type="range" id="ksRange" min="0" max="2" step="0.01" value="0.5">
+</div>
+<div>
+    <label for="sRange">s:</label>
+    <input type="range" id="sRange" min="1" max="100" step="1" value="20">
+</div>
+<div>
+    <label for="LiRange">Li:</label>
+    <input type="range" id="LiRange" min="0" max="2" step="0.01" value="1">
+</div>
+<button id="toggleMotion">Toggle motion</button>
+</body></html>
