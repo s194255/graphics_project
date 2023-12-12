@@ -1,6 +1,7 @@
 var Mo;
 var lightPos;
 var motion = 1.0;
+var ligtSpin = 1.0;
 function onReadOBJFile(fileString, fileName, gl, o, scale, reverse){
     var objDoc = new OBJDoc(fileName); // Create a OBJDoc object
     var result = objDoc.parse(fileString, scale, reverse);
@@ -99,6 +100,7 @@ function createSlidersTeapot(){
     var sRange = document.getElementById("sRange");
     var LiRange = document.getElementById("LiRange");
     var toggleMotion = document.getElementById("toggleMotion");
+    var toggleLightSpin = document.getElementById("toggleLightSpin");
     var k_dLoc = gl.getUniformLocation(teapotProgram, "k_d");
     var k_aLoc = gl.getUniformLocation(teapotProgram, "k_a");
     var LiLoc = gl.getUniformLocation(teapotProgram, "Li");
@@ -148,6 +150,10 @@ function createSlidersTeapot(){
 
     toggleMotion.addEventListener("click", function () {
         motion = 1 - motion;
+    });
+
+    toggleLightSpin.addEventListener("click", function () {
+        ligtSpin = 1 - ligtSpin;
     });
 }
 function initTeapot(){

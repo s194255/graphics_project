@@ -13,6 +13,7 @@ var num_indices_quad;
 var lightPos;
 var teapotHeightAngle = 0.0;
 var motion = 1.0;
+var ligtSpin = 1.0;
 window.onload = function init()
 {
     canvas = document.getElementById("c");
@@ -35,7 +36,7 @@ function render(){
     gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     updateGlobals();
-    renderGround();
+    // renderGround();
     renderShadow();
     renderTeapot();
 }
@@ -51,6 +52,12 @@ function renderTeapot(){
     lightPos = vec4(2*Math.sin(viewAngle) - 0.0, 3.0, 2*Math.cos(viewAngle)-1, -0.0);
     gl.uniform4fv(lightPosLoc, lightPos);
 
+
+    renderRealTeapot();
+    renderReflectionTeapot();
+}
+
+function renderRealTeapot(){
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
     modelTeapot.M = translate(0, -1, -3);
     var teapotHeight = 0.5;
@@ -59,6 +66,30 @@ function renderTeapot(){
 
     gl.uniform4fv(gl.getUniformLocation(teapotProgram, "colorScaler"), vec4(1.0, 1.0, 1.0, 1.0));
 
+    if (!g_drawingInfo && g_objDoc && g_objDoc.isMTLComplete()) {
+        // OBJ and all MTLs are available
+        g_drawingInfo = onReadComplete(gl, modelTeapot, g_objDoc);
+    }
+    if (!g_drawingInfo) return;
+    gl.drawElements(gl.TRIANGLES, g_drawingInfo.indices.length, gl.UNSIGNED_SHORT, 0);
+}
+
+function renderReflectionTeapot(){
+    var MLoc = gl.getUniformLocation(teapotProgram, "M");
+    modelTeapot.M = translate(0, -1, -3);
+    var teapotHeight = 0.5;
+    modelTeapot.M = mult(translate(0, teapotHeight*Math.sin(teapotHeightAngle)+teapotHeight, 0), modelTeapot.M);
+    var V_vec = vec3(0, 1, 0);
+    var P_vec = vec3(0, -1, -3);
+    var R = mat4(1-2*V_vec[0]*V_vec[0], -2*V_vec[0]*V_vec[1], -2*V_vec[0]*V_vec[2], 2*dot(V_vec, P_vec)*V_vec[0],
+                -2*V_vec[0]*V_vec[1], 1-2*V_vec[1]*V_vec[1], -2*V_vec[1]*V_vec[2], 2*dot(V_vec, P_vec)*V_vec[1],
+                -2*V_vec[0]*V_vec[2], -2*V_vec[1]*V_vec[2], 1-2*V_vec[2]*V_vec[2], 2*dot(V_vec, P_vec)*V_vec[2],
+                0, 0, 0, 1);
+    
+    modelTeapot.M = mult(R, modelTeapot.M);
+    gl.uniformMatrix4fv(MLoc, false, flatten(modelTeapot.M));
+    gl.uniform4fv(gl.getUniformLocation(teapotProgram, "colorScaler"), vec4(1.0, 1.0, 1.0, 1.0));
+    
     if (!g_drawingInfo && g_objDoc && g_objDoc.isMTLComplete()) {
         // OBJ and all MTLs are available
         g_drawingInfo = onReadComplete(gl, modelTeapot, g_objDoc);
@@ -113,7 +144,7 @@ function renderShadow(){
 }
 
 function animate() {
-    viewAngle = viewAngle + 0.01;
+    viewAngle = viewAngle + 0.01*ligtSpin;
     teapotHeightAngle = teapotHeightAngle + 0.02*motion;
     render();
     requestAnimationFrame(animate);
