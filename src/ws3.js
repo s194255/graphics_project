@@ -17,7 +17,7 @@ var ligtSpin = 1.0;
 window.onload = function init()
 {
     canvas = document.getElementById("c");
-    gl = WebGLUtils.setupWebGL(canvas, { alpha: false });
+    gl = WebGLUtils.setupWebGL(canvas, { alpha: false, stencil: true });
     gl.enable(gl.DEPTH_TEST);
     // gl.enable(gl.CULL_FACE);
     gl.enable(gl.BLEND);
@@ -36,10 +36,13 @@ window.onload = function init()
 
 function render(){
     gl.clearColor(0.3921, 0.5843, 0.9294, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
     updateGlobals();
+    gl.enable(gl.STENCIL_TEST);
     renderReflectionTeapot();
     renderGround();
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.disable(gl.STENCIL_TEST);
     renderShadow();
     renderRealTeapot();
 }
@@ -48,6 +51,7 @@ function render(){
 function renderRealTeapot(){
     gl.useProgram( teapotProgram );
     gl.depthFunc(gl.LESS);
+    gl.disable(gl.STENCIL_TEST);
     initAttributeVariable(gl, teapotProgram.a_Position, modelTeapot.vertexBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Normal, modelTeapot.normalBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
@@ -73,6 +77,17 @@ function renderRealTeapot(){
 function renderReflectionTeapot(){
     gl.useProgram( teapotProgram );
     gl.depthFunc(gl.LESS);
+    // gl.enable(gl.STENCIL_TEST);
+    gl.stencilFunc(
+        gl.EQUAL,     // the test
+        0,            // reference value
+        0xFF,         // mask
+     );
+     gl.stencilOp(
+        gl.KEEP,     // what to do if the stencil test fails
+        gl.KEEP,     // what to do if the depth test fails
+        gl.KEEP,     // what to do if both tests pass
+     );
     initAttributeVariable(gl, teapotProgram.a_Position, modelTeapot.vertexBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Normal, modelTeapot.normalBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
@@ -105,6 +120,17 @@ function renderReflectionTeapot(){
 function renderGround(){
     gl.useProgram( groundProgram );
     gl.depthFunc(gl.LESS);
+    // gl.enable(gl.STENCIL_TEST);
+    gl.stencilFunc(
+        gl.ALWAYS,    // the test
+        1,            // reference value
+        0xFF,         // mask
+     );
+    gl.stencilOp(
+        gl.KEEP,     // what to do if the stencil test fails
+        gl.KEEP,     // what to do if the depth test fails
+        gl.REPLACE,  // what to do if both tests pass
+    );
     initAttributeVariable(gl, groundProgram.vPosition, modelGround.vBuffer, 4, gl.FLOAT);
     initAttributeVariable(gl, groundProgram.vTexCoord, modelGround.texBuffer, 2, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelGround.iBuffer);
@@ -124,6 +150,7 @@ function renderGround(){
 function renderShadow(){
     gl.useProgram( teapotProgram );
     gl.depthFunc(gl.GREATER);
+    gl.disable(gl.STENCIL_TEST);
     initAttributeVariable(gl, teapotProgram.a_Position, modelTeapot.vertexBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Normal, modelTeapot.normalBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);

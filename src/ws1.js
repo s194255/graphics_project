@@ -38,9 +38,11 @@ function render(){
     updateGlobals();
     // renderGround();
     renderShadow();
-    renderTeapot();
+    renderRealTeapot();
+    renderReflectionTeapot();
 }
-function renderTeapot(){
+
+function renderRealTeapot(){
     gl.useProgram( teapotProgram );
     gl.depthFunc(gl.LESS);
     initAttributeVariable(gl, teapotProgram.a_Position, modelTeapot.vertexBuffer, 3, gl.FLOAT);
@@ -48,16 +50,7 @@ function renderTeapot(){
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
 
-    var lightPosLoc = gl.getUniformLocation(teapotProgram, "lightPos");
-    lightPos = vec4(2*Math.sin(viewAngle) - 0.0, 3.0, 2*Math.cos(viewAngle)-1, -0.0);
-    gl.uniform4fv(lightPosLoc, lightPos);
 
-
-    renderRealTeapot();
-    renderReflectionTeapot();
-}
-
-function renderRealTeapot(){
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
     modelTeapot.M = translate(0, -1, -3);
     var teapotHeight = 0.5;
@@ -75,6 +68,13 @@ function renderRealTeapot(){
 }
 
 function renderReflectionTeapot(){
+    gl.useProgram( teapotProgram );
+    gl.depthFunc(gl.LESS);
+    initAttributeVariable(gl, teapotProgram.a_Position, modelTeapot.vertexBuffer, 3, gl.FLOAT);
+    initAttributeVariable(gl, teapotProgram.a_Normal, modelTeapot.normalBuffer, 3, gl.FLOAT);
+    initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
+
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
     modelTeapot.M = translate(0, -1, -3);
     var teapotHeight = 0.5;
