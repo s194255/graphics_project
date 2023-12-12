@@ -92,6 +92,7 @@ function render(){
 
     renderReflectionTeapot();
     gl.disable(gl.STENCIL_TEST);
+    gl.clear(gl.DEPTH_BUFFER_BIT)
     renderGround();
     renderShadow();
     renderRealTeapot();
@@ -106,7 +107,7 @@ function renderRealTeapot(){
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
 
-
+    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "P"), false, flatten(P));
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
     modelTeapot.M = translate(0, -1, -3);
     var teapotHeight = 0.5;
@@ -130,6 +131,14 @@ function renderReflectionTeapot(){
     initAttributeVariable(gl, teapotProgram.a_Normal, modelTeapot.normalBuffer, 3, gl.FLOAT);
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
+
+    var eye_up = vec4(0.0, 1.0, 0.0 ,1.0);
+    var eye_plane = vec4(0.0, -1.0, -3.0, 1.0);
+    // var eye_up = mult(V,vec4(0.0, 1.0, 0.0 ,1.0));
+    // var eye_plane = mult(V,vec4(0.0, -1.0, -3.0, 1.0));
+    var Plane = vec4(eye_up[0], eye_up[1], eye_up[2], eye_up[0]*eye_plane[0]+eye_up[1]*eye_plane[1]+eye_up[2]*eye_plane[2]);
+    var P_refl = modifyProjectionMatrix(mult(V,Plane), P);
+    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "P"), false, flatten(P_refl));
 
 
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
@@ -162,6 +171,7 @@ function renderGround(){
     initAttributeVariable(gl, groundProgram.vTexCoord, modelGround.texBuffer, 2, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelGround.iBuffer);
 
+    gl.uniformMatrix4fv(gl.getUniformLocation(groundProgram, "P"), false, flatten(P));
     var MLoc = gl.getUniformLocation(groundProgram, "M");
     var M = mat4();
     gl.uniformMatrix4fv(MLoc, false, flatten(M));
@@ -182,6 +192,7 @@ function renderShadow(){
     initAttributeVariable(gl, teapotProgram.a_Color, modelTeapot.colorBuffer, 4, gl.FLOAT);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
 
+    gl.uniformMatrix4fv(gl.getUniformLocation(teapotProgram, "P"), false, flatten(P));
     var d = -(lightPos[1] - (-1.02));
     Mp = mat4(
         1, 0, 0, 0,
@@ -222,4 +233,16 @@ function updateGlobals(){
     var teapotHeight = 0.5;
     modelTeapot.M = mult(translate(0, teapotHeight*Math.sin(teapotHeightAngle)+teapotHeight, 0), modelTeapot.M);
     gl.uniformMatrix4fv(MLoc, false, flatten(modelTeapot.M));
+}
+function modifyProjectionMatrix(clipplane, projection) {
+    // MV.js has no copy constructor for matrices
+    var oblique = mult(mat4(), projection);
+    var q = vec4((Math.sign(clipplane[0]) + projection[0][2])/projection[0][0],
+    (Math.sign(clipplane[1]) + projection[1][2])/projection[1][1],
+    -1.0,
+    (1.0 + projection[2][2])/projection[2][3]);
+    var s = 2.0/dot(clipplane, q);
+    oblique[2] = vec4(clipplane[0]*s, clipplane[1]*s,
+    clipplane[2]*s + 1.0, clipplane[3]*s);
+    return oblique;
 }
