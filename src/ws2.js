@@ -98,6 +98,9 @@ function renderReflectionTeapot(){
 
 
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
+    modelTeapot.M = translate(0, -1, -3);
+    var teapotHeight = 0.5;
+    modelTeapot.M = mult(translate(0, teapotHeight*Math.sin(teapotHeightAngle)+teapotHeight, 0), modelTeapot.M);
     var V_vec = vec3(0, 1, 0);
     var P_vec = vec3(0, -1, -3);
     var R = mat4(1-2*V_vec[0]*V_vec[0], -2*V_vec[0]*V_vec[1], -2*V_vec[0]*V_vec[2], 2*dot(V_vec, P_vec)*V_vec[0],

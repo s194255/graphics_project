@@ -106,9 +106,7 @@ function renderRealTeapot(){
 
 
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
-    modelTeapot.M = translate(0, -1, -3);
-    var teapotHeight = 0.5;
-    modelTeapot.M = mult(translate(0, teapotHeight*Math.sin(teapotHeightAngle)+teapotHeight, 0), modelTeapot.M);
+    
     gl.uniformMatrix4fv(MLoc, false, flatten(modelTeapot.M));
 
     gl.uniform4fv(gl.getUniformLocation(teapotProgram, "colorScaler"), vec4(1.0, 1.0, 1.0, 1.0));
@@ -130,6 +128,9 @@ function renderReflectionTeapot(){
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, modelTeapot.indexBuffer);
 
     var MLoc = gl.getUniformLocation(teapotProgram, "M");
+    modelTeapot.M = translate(0, -1, -3);
+    var teapotHeight = 0.5;
+    modelTeapot.M = mult(translate(0, teapotHeight*Math.sin(teapotHeightAngle)+teapotHeight, 0), modelTeapot.M);
     var V_vec = vec3(0, 1, 0);
     var P_vec = vec3(0, -1, -3);
     var R = mat4(1-2*V_vec[0]*V_vec[0], -2*V_vec[0]*V_vec[1], -2*V_vec[0]*V_vec[2], 2*dot(V_vec, P_vec)*V_vec[0],
